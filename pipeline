@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven-3.8.6'   // Name from Jenkins "Global Tool Configuration"
+        jdk 'JDK11'           // Or JDK8 — must match Jenkins JDK name
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/<your-username>/hello-java-maven.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('Archive') {
+            steps {
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Build succeeded!'
+        }
+        failure {
+            echo '❌ Build failed!'
+        }
+    }
+}
+
